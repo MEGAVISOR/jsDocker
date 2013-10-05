@@ -1,0 +1,385 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>MJL Docs</title>
+    <style>
+        html, body {
+            font-family: Helvetica, Arial, sans-serif;
+            background-color: #eeeeee;
+            margin: 0px;
+            padding: 0px;
+            overflow-x: hidden;
+        }
+        
+        .static,
+        .option {
+            font-style: italic;
+        }
+        
+        .static,
+        .public,
+        .private,
+        .deprecated,
+        .class-title,
+        .option {
+            text-transform: lowercase;
+            color: #aaaaaa;
+            font-weight: normal;
+        }
+        
+        .option {
+            text-transform: none;
+        }
+
+        .class-example,
+        .namespace-example {
+            padding-left: 20px;
+        }
+
+        .member-returns,
+        .member-type,
+        .arguments,
+        .member-example {
+            padding-left: 15px;
+        }
+
+        * + .member-returns,
+        * + .member-type,
+        * + .arguments,
+        * + .member-example {
+            margin-top: 20px;
+        }
+
+        .doc {
+            padding: 10px;
+            padding-left: 310px; // 300 + 10
+            width: 100%;
+            box-sizing: border-box;
+            -moz-box-sizing: -moz-border-box;
+        }
+        
+        .navigator {
+            width: 300px;
+            position: fixed;
+            left: 0px;
+            top: 0px;
+            height: 100%;
+            overflow-y: scroll;
+            background-color: #dddddd;
+            padding: 10px;
+            padding-right: 0px;
+            -webkit-overflow-scrolling: touch;
+            font-size: 13px;
+            box-sizing: border-box;
+            -moz-box-sizing: -moz-border-box;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background-color: #000000;
+            opacity: 0.5;
+        }
+        
+        .navigator h1 {
+            padding: 0px;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+        
+        .navigator ul {
+            padding-left: 15px;
+        }
+
+        a, a:visited{
+            text-decoration: none;
+            color: #002EBE
+        }
+
+        a:hover{
+            text-decoration: none;
+            border-bottom:#002EBE 1px dashed;
+        }
+
+        .params{
+            border: none;
+        }
+
+        .params .one{
+            background: #ffffff;
+        }
+
+        .params .two{
+            background: #ffffff;
+        }
+
+        .params td{
+            border: solid 1px #d3d3d3;
+            padding: 3px 5px;
+        }
+
+        li{
+            list-style-type:disc;
+        }
+        
+        .ns-member {
+            background-color: #ffffff;
+            border-radius: 3px;
+            padding-top: 20px;
+            padding-bottom: 20px;
+            font-size: 16px;
+            max-width: 1000px;
+        }
+        
+        .ns-member,
+        .ns-member-expanded {
+            padding-top: 20px;
+            padding-bottom: 20px;
+        }
+        
+        .ns-member + .ns-member {
+            margin-top: 20px;
+        }
+        
+        .ns-member h1 {
+            padding: 0px;
+            margin: 0px;
+            font-size: 32px;
+        }
+        
+        .class-example,
+        .ns-member h1 + .class-description,
+        .ns-member h1 + .namespace-description,
+        .ns-member-expanded h2 + .member-description {
+            margin-top: 5px;
+        }
+        
+        .class-description,
+        .namespace-description {
+        }
+        
+        .ns-member h1,
+        .class-description,
+        .class-example,
+        .namespace-description,
+        .ns-member-expanded,
+        .settings {
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+        
+        .ns-head {
+            padding-bottom: 20px;
+            border-bottom: solid 3px #000000;
+        }
+        
+        .ns-member-expanded {
+           padding-left: 35px;
+        }
+        
+        .ns-member-expanded + .ns-member-expanded {
+            border-top: solid 1px #eeeeee;
+        }
+        
+        .ns-member-expanded h2 {
+            padding: 0px;
+            margin: 0px;
+            font-size: 20px;
+        }
+        
+        .ns-member-expanded h3 {
+            padding: 0px;
+            margin: 0px;
+            font-size: 16px;
+            font-style: italic;
+            margin-bottom: 3px;
+        }
+        
+        .ns-member-expanded table {
+            background-color: #ffffff;
+        }
+        
+        .ns-member-expanded table td {
+            padding: 7px;
+            vertical-align: top;
+        }
+        
+        .member-returns table td {
+            padding-left: 0px;
+            padding-top: 0px;
+            padding-bottom: 0px;
+        }
+        
+        .ns-member-deprecated,
+        .ns-member-deprecated h1,
+        .ns-member-expaneded-deprecated,
+        .ns-member-expaneded-deprecated h1,
+        .ns-member-expaneded-deprecated h2,
+        .ns-member-expaneded-deprecated h3 {
+            color: #aaaaaa;
+        }
+        
+        .no-deprecated .ns-member-deprecated,
+        .no-deprecated .ns-member-expanded-deprecated {
+            display: none;
+        }
+        
+        .no-private .ns-member-private {
+            display: none;
+        }
+        
+        .member-example {
+            font-size: 14px;
+            padding: 15px;
+            border: dotted 1px #aaaaaa;
+            background-color: #efefef;
+            /*white-space: pre;*/
+        }
+        
+    </style>
+</head>
+<body>
+
+<% function drawLevel(level){  if (isEmpty(level) ) return;%>
+    <ul>
+    <% for(var name in level){ if(level.hasOwnProperty(name) && name !== "!url" && name !== "!ns"){ %>
+        <li><a href="<%= level[name]['!url'] %>"><%= name %></a><% drawLevel(level[name]); %></li>
+    <%}}%>
+    </ul>
+<%};%>
+<div class="navigator">
+    <h1>Namespaces & Classes</h1>
+    <% drawLevel(namespaceTree); %>
+</div>
+<% function displayMembers(ns,stat,owned,prop,mtd,public,private){%>
+    <% for(var memb in ns){%>
+        <% if (ns.hasOwnProperty(memb) && memb[0] !=='@'){ %>
+            <% if(stat    && !ns[memb].static ) continue; %>
+            <% if(owned   &&  ns[memb].static ) continue; %>
+            <% if(prop    && !ns[memb].type   ) continue; %>
+            <% if(mtd     &&  ns[memb].type   ) continue; %>
+            <% if(public  && !ns[memb].public ) continue; %>
+            <% if(private &&  ns[memb].public ) continue; %>
+            <div class="ns-member-expanded <% if(ns[memb].public){%> ns-member-public<% } %> <% if(ns[memb].private){%> ns-member-private<% } %> <% if(ns[memb].deprecated){%>ns-member-expaneded-deprecated<%}%>">
+                <h2 <% if(isNS(memb)){%> id="<%= makeLinkFromNS(memb) %>"<%}%>>
+                    <% if(ns[memb].deprecated){%><span class="deprecated">deprecated</span><% } %>
+                    <% if(ns[memb].public){%><span class="public">public</span> <%} else {%><span class="private">private</span><% } %>
+                    <% if(ns[memb].static){%><span class="static">static</span> <%}%><%= memb === 'constructs' ? 'constructor' : memb %><% if(!ns[memb].type){%>(<% if(ns[memb].param && ns[memb].param.length){%><% ns[memb].param.forEach(function(param,index){%><% if ( param.name && param.name.indexOf('.') === -1 ) { %><% if ( index != 0 ) { %>, <%}%><%= param.name %><%}});%><%}%>)<%}%></h2>
+                <% if ( ns[memb].description[0] ){ %>
+                    <div class="member-description"><%- ns[memb].description[0] %></div>
+                <% } %>
+                <% if(ns[memb].example){%>
+                <div class="member-example"><pre><code><%- ns[memb].example[0] %></code></pre></div>
+                <%}%>
+                <% if(ns[memb].param && ns[memb].param.length){%>
+                    <div class="arguments">
+                    <h3>Аргументы</h3>
+                    <table class="params" cellspacing="0" cellpadding="0" rules="none">
+                        <thead><td class="one"></td><td class="two">Тип</td><td class="one">По-умолчанию</td><td class="two">Описание</td></thead>
+                        <% ns[memb].param.forEach(function(param){%>
+                            <tr>
+                                <td><%= param.name %><% if ( !param.required ) { %> <span class="option">Опция</span><% } %></td>
+                                <td><%- param.type?makeLinkToType(param.type):'' %></td>
+                                <td><%= param.default?param.default:'' %></td>
+                                <td><%- param.description?param.description:'' %></td>
+                            </tr>
+                        <%});%>
+                    </table>
+                    </div>
+                <%}%>
+                <% if(ns[memb].type){%>
+                    <div class="member-type">
+                        <h3>Тип:</h3> <span><%- makeLinkToType(ns[memb].type[0]) %></span>
+                    </div>
+                <%}%>
+                <% if(ns[memb].returns && ns[memb].returns.length){ %>
+                    <div class="member-returns">
+                    <h3>Возвращает</h3>
+                    <table>
+                    <% for(var i=0;i < ns[memb].returns.length;i++){%>
+                        <tr><td><%- makeLinkToType(ns[memb].returns[i]) %></td></tr>
+                    <%}%>
+                    </table>
+                    </div>
+                <%}%>
+              </div>
+          <%}%>
+    <%}%>
+<%}%>
+
+<!-- вот тут надо по идее идти по списочку от ul а не дереву
+todo порядок следования
+-->
+
+<%
+    function drawNS(ns,name){
+        for(var nstItm in ns){
+            if(
+                ns.hasOwnProperty(nstItm)
+            ){
+                if (tree.hasOwnProperty(ns[nstItm]['!ns'])){
+                    var itm = ns[nstItm]['!ns'];%>
+                    <div class="ns-member<% if(tree[itm]['@deprecated'] && tree[itm]['@deprecated'][0]) { %> ns-member-deprecated<% } %>">
+                        <% if(tree[itm]['@class']){ %>
+                            <div class="ns-head">
+                                <h1 id="<%= makeLinkFromNS(tree[itm]['@class'][0].nameSpace)%>"><span class="class-title"><% if(tree[itm]['@deprecated'] && tree[itm]['@deprecated'][0]) { %>deprecated <% } %>Class </span><%= tree[itm]['@class'][0].nameSpace%></h1>
+                                <div class="class-description"><% if(tree[itm]['@extends']){ %>Наследник <a href="#<%= makeLinkFromNS(tree[itm]['@extends'][0])%>"><%= tree[itm]['@extends'][0] %></a>. <%}%><%- tree[itm]['@description'][0]%>  </div>
+                                <% if(tree[itm]['@example']){%>
+                                <div class="class-example"><div class="member-example"><pre><code><%- tree[itm]['@example'][0] %></code></pre></div></div>
+                                <%}%>
+                            </div>
+                            <% displayMembers(tree[itm],true,false,false,true,true,false); // static public methods %>
+                            <% displayMembers(tree[itm],true,false,false,true,false,true); // static private methods %>
+                            <% displayMembers(tree[itm],true,false,true,false,true,false); // static public props %>
+                            <% displayMembers(tree[itm],true,false,true,false,false,true); // static private props %>
+
+                            <% displayMembers(tree[itm],false,true,false,true,true,false); // public methods %>
+                            <% displayMembers(tree[itm],false,true,false,true,false,true); // private methods %>
+                            <% displayMembers(tree[itm],false,true,true,false,true,false); // public props %>
+                            <% displayMembers(tree[itm],false,true,true,false,false,true); // private props %>
+                        <%}else if (tree[itm]['@description']) {%>
+                            <div class="ns-head">
+                                <h1 id="<%= makeLinkFromNS(itm)%>"><span class="namespace-title">Namespace </span><%= itm%></h1>
+                                <div class="namespace-description"><%- tree[itm]['@description'][0]%>  </div>
+                            </div>
+                            <% if(tree[itm]['@example']){%>
+                                <div class="namespace-example">
+                                    <%- tree[itm]['@example'][0] %>
+                                </div>
+                            <%}%>
+                            <% displayMembers(tree[itm],false,true,true,false) // static public methods %>
+                            <% displayMembers(tree[itm],false,true,false,true) // static private methods %>
+                            <% displayMembers(tree[itm],true,false,true,false); // static public props %>
+                            <% displayMembers(tree[itm],true,false,false,true); // static private props %>
+
+                            <% displayMembers(tree[itm],false,true,false,true,true,false); // public methods %>
+                            <% displayMembers(tree[itm],false,true,false,true,false,true); // private methods %>
+                            <% displayMembers(tree[itm],false,true,true,false,true,false); // public props %>
+                            <% displayMembers(tree[itm],false,true,true,false,false,true); // private props %>
+                        <%}%>
+                        <!--%= JSON.stringify(ns[nstItm],null,4) %-->
+                    </div>
+                <%
+                }
+                if (nstItm[0] !== '!'){
+                    drawNS(ns[nstItm],nstItm);
+                }
+            }
+        }
+    }
+%>
+<div class="doc">
+<div class="ns-member">
+   <div class="settings">
+       <input id="togglePrivate" type="checkbox" checked onchange="if(!this.checked)document.querySelector('.doc').classList.add('no-private');else document.querySelector('.doc').classList.remove('no-private');"><label for="togglePrivate">Show private</label>
+       <input id="toggleDeprecated" type="checkbox" onchange="if(!this.checked)document.querySelector('.doc').classList.add('no-deprecated');else document.querySelector('.doc').classList.remove('no-deprecated');" checked><label for="toggleDeprecated">Show deprecated</label>
+   </div>
+</div>
+<% drawNS(namespaceTree); %>
+</div>
+</body>
+</html>

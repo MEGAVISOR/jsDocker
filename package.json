@@ -1,0 +1,18 @@
+{
+    "name": "jsDocker",
+    "version": "0.0.2",
+    "description": "documentor for any javascript files",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/MEGAVISOR/jsDocker.git"
+    },
+    "scripts": {
+        "test-all": "./doc -D 4 -S -O ./test/output ./test/toDoc"
+    },
+    "devDependencies": {
+        "commander"       : ">=2.0.0",
+        "ejs"             : ">=0.8.4",
+        "wrench"          : ">=1.4.4"
+    },
+    "private": true
+}
