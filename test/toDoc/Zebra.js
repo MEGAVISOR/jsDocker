@@ -9,7 +9,7 @@ class Zebra extends Animals{
 
     /**
      * Пытаемся съесть кого-то, мы едим только травку
-     * @param who
+     * @param {Object} who
      */
     eat(who){
         if (who instanceof Grass){

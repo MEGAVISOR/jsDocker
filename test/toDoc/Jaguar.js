@@ -9,7 +9,7 @@ class Jaguar extends Animals{
 
     /**
      * Мы хищник мы едим только других животных
-     * @param who
+     * @param {Object} who
      */
     eat(who){
         if (who instanceof Animals){

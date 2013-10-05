@@ -32,30 +32,61 @@ module.exports = function(infile,outfile){
         var prepareNamespaceTree = function(tree){
             // тут такое дело что дерево очень хорошо сделать в виде дерева
             var result = {};
+
+            // перебираем дерево
             for (var name in tree){
+
                 if (tree.hasOwnProperty(name)){
 
+                    //  если какая-то ветвь пустая то пропускаем ее
                     if (isEmpty(tree[name])){
                         continue;
                     }
 
-                    var ns = name.split('.');
+                    // разбиваем название нашей ветви на куски
+                    var ns = name.split('.'),
+                        // складываем результат в obj нам так удобнее
+                        obj = result,
+                        // урлы у нас внутри страницы посему они начинаются с #
+                        url = '#',
+                        // это генерируемый неймспейс
+                        nameSpaceGenerated = [];
 
-                    var obj = result;
-                    var url = '#';
-                    var nsg = [];
+                    // если мы после разбивки получили что нейспейс состоит хотябы из одного объекта
                     if (ns.length > 0){
+
                         ns.forEach(function(itm){
+                            // добавляем к урлу кусочек неймспейса
                             url += '_' + itm;
-                            nsg.push(itm);
+                            // запоминаем кусочек в генераторе
+                            nameSpaceGenerated.push(itm);
+
+                            // если у нас нету неймспейса в конечном дереве то создаем его
                             if(!obj[itm]){
-                                obj[itm] = {};
-                                obj[itm]['!url'] = url;
-                                obj[itm]['!ns'] = nsg.join('.');
+                                obj[itm] = {
+                                    '!url':url, // это будет ссылка на узел
+                                    '!ns' :nameSpaceGenerated.join('.') // это название неймспеса (вероятно )
+                                };
                             }
+                            // смещаем указатель в глубину неймспейса
                             obj =  obj[itm];
+
                         });
                     }
+                    // после прохода по неймспейсу у нас сгенерирурется объект
+                    // например для Animals.Jaguar
+                    //{
+                    //    'Animals':{
+                    //        '!url':'#_Animals',
+                    //        '!ns':'Animals',
+                    //        'Jaguar':{
+                    //            '!url':'#_Animals_Jaguar',
+                    //            '!ns':'Animals.Jaguar'
+                    //        }
+                    //    }
+                    //}
+                    //
+
                 }
             }
             return result;
@@ -66,18 +97,27 @@ module.exports = function(infile,outfile){
         var namespaceTree = prepareNamespaceTree(tree);
 
         var orderAlfabatically = function(ns){
+            // пытаемся отсортировать неймспейсы
+
             if (ns === Object(ns)){
-                var result = {};
-                var items = [];
+                var result = {},
+                    items = [];
+                // сначала извлекаем все ключи для текущего уровня
                 for (var prop in ns){
                     if (ns.hasOwnProperty(prop)){
                         items.push(prop);
                     }
                 }
+
+                // сортируем
                 items.sort();
+
                 items.forEach(function(item){
+                    // складываем в правильном порядке в результат
+                    // и просим тоже самое проделать с дочерними элементами каждого ключа
                     result[item] =  orderAlfabatically(ns[item]);
                 });
+                // возвращаем правильно отсортированный объект
                 return result;
             }
             return ns;

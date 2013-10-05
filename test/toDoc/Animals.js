@@ -24,7 +24,7 @@ class Animals {
 
     /**
      * Поедание
-     * @param who
+     * @param {Object} who
      */
     eat(who){
         console.log('Om nom nom ' + who.getName() + ' so good');
